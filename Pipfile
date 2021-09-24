@@ -6,7 +6,7 @@ verify_ssl = true
 [dev-packages]
 jupyterlab = "*"
 jupyter-dash = "*"
-jupyter-proxy-server = "*"
+jupyter-server-proxy = "*"
 jupyterlab-code-formatter = "*"
 black = "*"
 isort = "*"
