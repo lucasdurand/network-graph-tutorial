@@ -1,0 +1,4 @@
+dash
+dash-cytoscape
+pandas
+numpy

@@ -1,0 +1,22 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+jupyterlab = "*"
+jupyter-dash = "*"
+jupyterlab-code-formatter = "*"
+black = "*"
+isort = "*"
+
+[packages]
+numpy = "*"
+pandas = "*"
+dash = "*"
+plotly = "*"
+networkx = "*"
+dash-cytoscape = "*"
+
+[requires]
+python_version = "3.9"
