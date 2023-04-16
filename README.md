@@ -33,7 +33,7 @@ Follow along yourself in [![Binder](https://mybinder.org/badge_logo.svg)](https:
 
 ### Finding Communities
 
-* Using *closeness* and *connectedness* to define communities and find peers with `sklearn` and [`networkx.communities`](https://networkx.org/documentation/stable/index.html)
+* Using *closeness* and *connectedness* to define communities and find peers with [`sklearn`](https://scikit-learn.org/stable/) and [`networkx.communities`](https://networkx.org/documentation/stable/index.html)
 
 ### Exploring Communities with an Interactive App
 
