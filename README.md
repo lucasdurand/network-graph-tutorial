@@ -6,15 +6,13 @@
 
 **People are hard to understand, developers doubly so! In this tutorial, we will explore how communities form in organizations to develop a better solution than "The Org Chart". We will walk through using a few key Python libraries in the space, develop a toolkit for Clustering Attributed Graphs (more on that later) and build out an extensible interactive dashboard application that promises to take your legacy HR reporting structure to the next level.**
 
----
-
 > In this tutorial, we will develop some fundamental knowledge on Graph Theory and capabilities in using key Python libraries to construct and analyze network graphs, including xarray, networkx, and dash-cytoscape. The goal of this talk is to build the tools you need to launch your own interactive dashboard in Python that can help explore communities of people based on shared characteristics (e.g. programming languages, projects worked on, apps used, management structure). The data we will dig into focuses on building a better understanding of developers + users and how they form communities, but this could just as easily be extended to any social network. The work we do here can be easily extended to your communities and use cases -- let's build something together!
 
 > This talk is aimed at Pythonistas with beginner+ experience; we talk through some complex libraries and mathematical concepts, but beginners should be able to follow along and still build their understanding (and an app!)
 
----
-
 Follow along yourself in [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/lucasdurand/peopleanalytics/HEAD)!
+
+---
 
 ## Outline
 
