@@ -19,7 +19,6 @@ Follow along yourself in [![Binder](https://mybinder.org/badge_logo.svg)](https:
 ### Data
 
 * Generate representative sample data with [`Faker`](https://faker.readthedocs.io/en/master/), [`numpy`](https://numpy.org/doc/stable/), [`pandas`](https://pandas.pydata.org/docs/)
-* Do some visual checks that this is 
 
 ### Building a *Simple* Network Graph
 
