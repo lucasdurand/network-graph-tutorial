@@ -16,23 +16,20 @@ Follow along yourself in [![Binder](https://mybinder.org/badge_logo.svg)](https:
 
 ## Outline
 
-### Data
+### [Data](Part 0 - The Data/README.md)
 
 * Generate representative sample data with [`Faker`](https://faker.readthedocs.io/en/master/), [`numpy`](https://numpy.org/doc/stable/), [`pandas`](https://pandas.pydata.org/docs/)
 
-### Building a *Simple* Network Graph
+### [Building a *Simple* Network Graph](Part 1 - The Graph/README.md)
 
 * Represent people as a network graph in [`networkx`](https://networkx.org/documentation/stable/index.html), visualize the graph with [`plotly`](https://plotly.com/python/)
 
-### Clustered Attribute Graphs
+### [Clustered Attribute Graphs](Part 2 - Clustered Graph Attributes/README.md)
 
 * Introduce node attributes into the graph and explore clustering methods with [`networkx`](https://networkx.org/documentation/stable/index.html), [`node2vec`](https://github.com/eliorc/node2vec)
-
-### Finding Communities
-
 * Using *closeness* and *connectedness* to define communities and find peers with [`sklearn`](https://scikit-learn.org/stable/) and [`networkx.communities`](https://networkx.org/documentation/stable/index.html)
 
-### Exploring Communities with an Interactive App
+### [Exploring Communities with an Interactive App](Part 3 - An App/README.md)
 
 * Build a an app with [`dash`](https://plotly.com/dash/) and [`dash-cytoscape`](https://dash.plotly.com/cytoscape) to expose our analytics toolkit and explore the communities inside our fictional company
 
