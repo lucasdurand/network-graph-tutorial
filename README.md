@@ -11,7 +11,7 @@
 > This talk is aimed at Pythonistas with beginner+ experience; we talk through some complex libraries and mathematical concepts, but beginners should be able to follow along and still build their understanding (and an app!)
 
 * Follow along yourself in [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/lucasdurand/network-graph-tutorial/HEAD)!
-* **OR!** open me in [Codespaces](https://github.com/features/codespaces)
+* **OR!** open me in [Codespaces](https://github.com/features/codespaces): https://github.dev/lucasdurand/network-graph-tutorial/tree/main
 
 ---
 
