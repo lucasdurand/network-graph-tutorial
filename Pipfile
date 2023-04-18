@@ -10,14 +10,13 @@ jupyter-server-proxy = "*"
 jupyterlab-code-formatter = "*"
 black = "*"
 isort = "*"
+ipykernel = "*"
 
 [packages]
-numpy = "*"
 pandas = "*"
 dash = "*"
-plotly = "*"
 networkx = "*"
 dash-cytoscape = "*"
 
 [requires]
-python_version = "3.9"
+python_version = "3.11"

@@ -1,0 +1,4 @@
+flask
+dash
+dash-cytoscape
+pandas
