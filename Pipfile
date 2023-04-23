@@ -15,6 +15,7 @@ ipykernel = "*"
 [packages]
 pandas = "*"
 dash = "*"
+dash-bootstrap-components = "*"
 networkx = "*"
 dash-cytoscape = "*"
 
