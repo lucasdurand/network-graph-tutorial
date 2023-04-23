@@ -17,7 +17,7 @@ pylint = "*"
 pandas = "*"
 dash = "*"
 networkx = "*"
-dash-cytoscape = "*"
+dash-cytoscape = "!=0.3.0"
 faker = "*"
 matplotlib = "*"
 
