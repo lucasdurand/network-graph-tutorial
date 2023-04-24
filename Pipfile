@@ -11,12 +11,18 @@ jupyterlab-code-formatter = "*"
 black = "*"
 isort = "*"
 ipykernel = "*"
+pylint = "*"
 
 [packages]
 pandas = "*"
 dash = "*"
+dash-bootstrap-components = "*"
 networkx = "*"
-dash-cytoscape = "*"
+dash-cytoscape = "!=0.3.0"
+faker = "*"
+matplotlib = "*"
+more-itertools = "*"
+gunicorn = {version = "*", sys_platform = "== 'linux'"}
 
 [requires]
 python_version = "3.11"
