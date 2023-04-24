@@ -22,6 +22,7 @@ dash-cytoscape = "!=0.3.0"
 faker = "*"
 matplotlib = "*"
 more-itertools = "*"
+gunicorn = {version = "*", sys_platform = "== 'linux'"}
 
 [requires]
 python_version = "3.11"
