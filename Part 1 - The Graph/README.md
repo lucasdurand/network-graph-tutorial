@@ -8,4 +8,6 @@ Here we familiarize ourselves with Network Graphs in general and build up a tool
 * Visualize the graph
 * Explore the organization structure using an interactive plot
 
+* Get started in the [**Workbook**](https://github.dev/lucasdurand/network-graph-tutorial/blob/develop/Part%201%20-%20The%20Graph/Workbook.ipynb)
+
 **Extras**

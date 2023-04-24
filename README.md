@@ -17,6 +17,8 @@
 
 ## Outline
 
+First, [some slides!](https://docs.google.com/presentation/d/1Dcwspo5mkD8sVzpnLqyyLLwChlDaq4Gs/edit?usp=sharing&ouid=109162096397202966939&rtpof=true&sd=true)
+
 ### [Data](Part 0 - The Data/README.md)
 
 * Generate representative sample data with [`Faker`](https://faker.readthedocs.io/en/master/), [`numpy`](https://numpy.org/doc/stable/), [`pandas`](https://pandas.pydata.org/docs/)
@@ -27,7 +29,8 @@
 
 ### [Clustered Attribute Graphs](Part 2 - Clustered Graph Attributes/README.md)
 
-* Introduce node attributes into the graph and explore clustering methods with [`networkx`](https://networkx.org/documentation/stable/index.html), [`node2vec`](https://github.com/eliorc/node2vec)
+* Introduce node attributes into the graph
+* Explore clustering methods with [`networkx`](https://networkx.org/documentation/stable/index.html), [`node2vec`](https://github.com/eliorc/node2vec)
 * Using *closeness* and *connectedness* to define communities and find peers with [`sklearn`](https://scikit-learn.org/stable/) and [`networkx.communities`](https://networkx.org/documentation/stable/index.html)
 
 ### [Exploring Communities with an Interactive App](Part 3 - An App/README.md)
