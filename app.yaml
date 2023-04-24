@@ -1,2 +1,4 @@
 runtime: python311
-entrypoint: gunicorn -b :$PORT main:app --timeout 60
+entrypoint: gunicorn -b :$PORT main:app --timeout 60 -w 1
+
+instance_class: F2
