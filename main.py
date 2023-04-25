@@ -3,16 +3,20 @@
 
 # # People
 # 
-# What are they? How can we represent people in a meaningful way that doesn't get any of us fired for exfiltrating data?
+# What are they? How can we represent people in a meaningful way without having *real* data to draw from. In our organization we should have a few key pieces of information on each person:
+# 
+# * Unique identifier (a name would be great)
+# * Office/Location
+# * Job Title
+# * Team / Line of Business
+# * Manager (this is key to understanding how reporting works)
+# * Other info: programming languages, apps used, timezone, date hired, projects worked on, ...
 # 
 # ## Faker
 # 
 # Let's generate some fake data! https://faker.readthedocs.io/en/master/
-# 
-# 
-# 
 
-# In[40]:
+# In[229]:
 
 
 from faker import Faker
@@ -21,39 +25,76 @@ fake = Faker()
 fake.profile() # lots of great stuff in here!
 
 
+# We can also do things like ensure uniqueness for individual entries across all entries
+
+# In[230]:
+
+
+from faker.exceptions import UniquenessException
+try:
+    for i in range(10):
+        print(fake.unique.prefix())
+except UniquenessException:
+    print("😟")
+
+
+# Try generating a few people and see if it looks like a good representation of our organization
+
+# In[231]:
+
+
+...
+
+
 # This is a good start but ... it's kind of wonky. We have people all over the world with so many different jobs! Let's keep the spirit of this but implement some of our own limitations on fields to ensure things line up with what we'd expect a company org to look like
+# 
 
-# In[41]:
+# First, a few more interesting features: we can also register new `providers` if anything is missing. If needed these can be customized for different locales 
 
-
-import numpy as np
-import random
-
-
-def choose_a_few(
-    options: list[str],
-    weights: list[int | float] = None,
-    max_choices: int = None,
-    min_choices: int = 0,
-) -> set[str]:
-    """A helpful function to pick a random number of choices from a list of options
-    
-    By default skews the weights toward the first options in the list"""
-    max_choices = np.clip(max_choices or len(options), min_choices, len(options))
-    
-    # how many choices will we make this time?
-    divisor = max_choices * (max_choices + 1) / 2    
-    k_weights = [int(x) / divisor for x in range(max_choices, min_choices-1, -1)]
-    n_choices = np.random.choice(list(range(min_choices,max_choices+1)), p=k_weights)
-    
-    # make the choices
-    choices = random.choices(options, weights=weights, k=n_choices)
-    return set(choices)
+# In[232]:
 
 
-# To ground us in this task, let's define a new `Person` object that we can fill up with info:
+from faker.providers import DynamicProvider
 
-# In[42]:
+employment_status_provider = DynamicProvider(
+     provider_name="employment",
+     elements=["Full Time", "Part Time", "Contract"],
+)
+
+fake.add_provider(employment_status_provider)
+
+fake.employment()
+
+
+# We can customize this further by using the `Faker.BaseProvider`
+
+# In[233]:
+
+
+# first, import a similar Provider or use the default one
+from more_itertools import one
+from faker.providers import BaseProvider
+
+# create new provider class
+class EmploymentStatus(BaseProvider):
+    statuses = {"Full Time": 0.7, "Part Time": 0.05, "Contract": 0.3}
+    def employment(self) -> str:
+        return one(fake.random.choices(
+            list(self.statuses), 
+            weights=self.statuses.values()
+        ))
+
+# then add new provider to faker instance
+fake.add_provider(EmploymentStatus)
+
+fake.employment()
+
+
+# ### A Tech Focused Person Data
+
+# To ground us in this task, let's define a new `Person` object that we can fill up with info (and a few other objects):
+
+# In[234]:
 
 
 from dataclasses import dataclass, field
@@ -74,6 +115,7 @@ class Location:
 
 @dataclass
 class Person:
+    """Someone who works in our company!"""
     name: str
     hire_date: datetime.date
     status: Literal["Full Time", "Part Time", "Contract"]
@@ -84,37 +126,70 @@ class Person:
     location: Location = None
 
 
-# Now to make some people: 
-
-# In[43]:
+# In[235]:
 
 
-import pandas as pd
+Person(name="Employee #1",hire_date=datetime.date.today(), status="Full Time", location=Location("New York", "EST", "USA"))
+
+
+# In[236]:
+
+
 import numpy as np
-from faker import Faker
 import random
 
-# create some fake data
-fake = Faker()
+def choose_a_few(
+    options: list[str],
+    weights: list[int | float] = None,
+    max_choices: int = None,
+    min_choices: int = 0,
+) -> list[str]:
+    """A helpful function to pick a random number of choices from a list of options
+    
+    By default skews the weights toward the first options in the list"""
+    max_choices = np.clip(max_choices or len(options), min_choices, len(options))
+    
+    # how many choices will we make this time?
+    divisor = max_choices * (max_choices + 1) / 2    
+    k_weights = [int(x) / divisor for x in range(max_choices, min_choices-1, -1)]
+    n_choices = np.random.choice(list(range(min_choices,max_choices+1)), p=k_weights)
+    
+    # make the choices
+    choices = random.choices(options, weights=weights, k=n_choices)
+    return list(set(choices))
 
-employment = {"Full Time": 0.7, "Part Time": 0.05, "Contract": 0.3}
-languages = {
-    "Python": 0.25,
-    "Scala": 0.1,
-    "Go": 0.08,
-    "JavaScript": 0.3,
-    "Java": 0.3,
-    "Typescript": 0.17,
-    "Erlang": 0.01,
-    "Elixir": 0.001,
-}
+
+# Now to make some people. Let's re-use whatever we can from `Faker` and then add some more of our own fields. We can also extend where needed to keep our code clear and consistent:
+
+# In[237]:
+
+
+class ProgrammingLanguages(BaseProvider):    
+    languages = {
+        "Python": 0.25,
+        "Scala": 0.1,
+        "Go": 0.08,
+        "JavaScript": 0.3,
+        "Java": 0.3,
+        "Typescript": 0.17,
+        "Erlang": 0.01,
+        "Elixir": 0.001,
+    }
+    def programming_languages(self) -> str:
+        return choose_a_few(list(self.languages), weights=self.languages.values())
+
+fake.add_provider(ProgrammingLanguages)
+
+
+# In[238]:
+
 
 def make_person() -> Person:
     return Person(
         name = fake.name(),
         hire_date = fake.date_between(start_date="-3y", end_date="today"),
-        status = choose_a_few(list(employment), max_choices=1, min_choices=1),
-        languages = choose_a_few(list(languages.keys()), weights=list(languages.values())),
+        status = fake.employment(),
+        languages = fake.programming_languages(),
         team = None, # hrmmmm this is harder
         title = None, # let's be smarter with this
         location = None, # let's also be smarter with this
@@ -123,15 +198,15 @@ def make_person() -> Person:
 make_person()
 
 
-# Now we can generate more complex attributes in a smart way. Let's set up some rules about where offices are, what teams are in which offices, then pick titles based on other info (e.g. Developers probably know at least one language ... and executives are fulltime?)
+# Now we can generate more complex attributes in a smart way. Let's set up some rules about where offices are, what teams are in which offices, then pick titles based on other info (e.g. Developers probably know at least one language ... )
 
-# In[44]:
+# In[239]:
 
 
 TEAM_TITLES:dict[str,list[str]] = {
     "DevX": ["Engineer", "Engineer", "Engineer", "Engineer", "Engineer", "AVP"],
-    "DevOps": ["Engineer", "Senior Engineer", "Manager"],
-    "Sales": ["Associate"],
+    "DevOps": ["Engineer", "Senior Engineer", "Manager", "Senior Manager"],
+    "Sales": ["Associate", "VP"],
     "Support": ["Analyst", "Manager"],
     "Platform": ["Engineer", "Senior Engineer","Managing Engineer", "AVP", "VP"],
     "Product": ["Engineer", "Manager", "Product Owner", "AVP", "VP"],
@@ -139,31 +214,30 @@ TEAM_TITLES:dict[str,list[str]] = {
     "Business": ["Analyst", "Associate", "Vice President", "Director", "Managing Director"]
 }
 
+# codify the hierarchical structure
+allowed_teams_per_office = {
+    "New York": ["Sales", "Product", "Business"],
+    "Toronto": ["Platform", "Product", "Internal Tools", "Sales", "Business"],
+    "Fort Lauderdale": ["DevX"],
+    "Dublin": ["DevOps", "Support"],
+    "London": ["Sales", "Business"],
+    "Seattle": ["Internal Tools", "Product", "Platform"],
+}
+offices = {
+    location.city: location
+    for location in [
+        Location("New York", tz="EST", country="USA"),
+        Location("Seattle", tz="PST", country="USA"),
+        Location("Toronto", tz="EST", country="CAN"),
+        Location("London", tz="UTC", country="GBR"),
+        Location("Fort Lauderdale", tz="EST", country="USA"),
+        Location("Dublin", tz="UTC", country="IRL"),
+    ]
+}
 
 def title_city_team():
     # just a few locations
-    offices = {
-        location.city: location
-        for location in [
-            Location("New York", tz="EST", country="USA"),
-            Location("Seattle", tz="PST", country="USA"),
-            Location("Toronto", tz="EST", country="CAN"),
-            Location("London", tz="UTC", country="GBR"),
-            Location("Fort Lauderdale", tz="EST", country="USA"),
-            Location("Dublin", tz="UTC", country="IRL"),
-        ]
-    }
-    # codify the hierarchical structure
-    allowed_teams_per_office = {
-        "New York": ["Sales", "Product", "Business"],
-        "Toronto": ["Platform", "Product", "Internal Tools", "Sales", "Business"],
-        "Fort Lauderdale": ["DevX"],
-        "Dublin": ["DevOps", "Support"],
-        "London": ["Sales", "Business"],
-        "Seattle": ["Internal Tools", "Product", "Platform"],
-    }
     allowed_titles_per_team = TEAM_TITLES
-
     city = random.choice(list(offices))
     team = random.choice(allowed_teams_per_office[city])
     title = choose_a_few(
@@ -182,7 +256,7 @@ title_city_team()
 
 # After running this we should have a better balanced org in terms of region + titles. Then we just need to add the connections in -- i.e. who's the boss?!
 
-# In[45]:
+# In[240]:
 
 
 def make_person() -> Person:
@@ -191,60 +265,70 @@ def make_person() -> Person:
     return Person(
         name = fake.name(),
         hire_date = fake.date_between(start_date="-3y", end_date="today"),
-        status = choose_a_few(list(employment), max_choices=1, min_choices=1),
-        languages = choose_a_few(list(languages.keys()), weights=list(languages.values()), min_choices=technical),
+        status = fake.employment(),
+        languages = fake.programming_languages(),
         **title_city_team_,
     )
 
 
-# In[46]:
+# In[241]:
 
 
+import pandas as pd
 people_df = pd.DataFrame((make_person() for _ in range(150)))
 people_df.head()
 
 
-# So, let's group by Team and then pick a manager for everyone:
+# So, let's group by Team and then pick a manager for everyone. Let's use these rules:
+# 
+# * People report to someone of a higher title if possible, else to a peer
+# * Reporting happens within a team
+# * We already ordered `TEAM_TITLES` based on *rank*
+# * Team leads should be listed as reporting to themselves (for now)
 
-# In[47]:
+# In[242]:
 
 
+# calculate team ranks
 ranks = {team: {title: rank + 1 for rank,title in enumerate(titles)} for team, titles in TEAM_TITLES.items()}
 for team in ranks:
     people_df.loc[people_df.team==team, "rank"] = people_df.loc[people_df.team==team].title.map(ranks[team])
 people_df = people_df.sort_values(by=["team","rank"])
+people_df.sample(3)
 
 
-# In[48]:
+# In[244]:
 
 
-def naivereportsto(row, df):
+# determine supervisor
+def naivereportsto(row, df, allow_peer_reports:bool=False):
     supervisor = (
-        df[(df.index < row.name)].query(f"""rank <= {row["rank"]}-1""").tail(1)["name"]
+        df[(df.index < row.name)].query(f"""rank > {row["rank"]}""").tail(1)["name"]
     )
     supervisor = supervisor.item() if not supervisor.empty else None
-    peer = df[(df.index < row.name)].query(f"""rank  == {row["rank"]}""").head(1)["name"]
-    peer = peer.item() if not peer.empty else None
-    return supervisor or peer or row["name"]
+    if not supervisor and allow_peer_reports:
+        peer = df[(df.index < row.name)].query(f"""rank  == {row["rank"]}""").head(1)["name"]
+        peer = peer.item() if not peer.empty else None
+        return supervisor or peer or row["name"]
+    return supervisor or row["name"]
 
 
-def reportsto(df):
-    return df.assign(manager=df.apply(naivereportsto, df=df, axis=1))
+def reportsto(df, allow_peer_reports:bool):
+    return df.assign(manager=df.apply(naivereportsto, df=df, allow_peer_reports=allow_peer_reports, axis=1))
 
 
-def supervisors(df):
-    df["peoplemanager"] = df.apply(naivereportsto, df=df, axis=1)
-    df = df.groupby("team", group_keys=False).apply(reportsto).reset_index(drop=True)
+def supervisors(df, allow_peer_reports:bool):
+    df = df.groupby("team", group_keys=False).apply(reportsto, allow_peer_reports=allow_peer_reports).reset_index(drop=True)
     return df
 
 
-people_df = people_df.pipe(supervisors)
-people_df.head(5)
+people_df = people_df.pipe(supervisors, allow_peer_reports=True)
+people_df.sample(5)
 
 
-# Now we just need a CEO for all the team leads to report to. Set their manager as themselves to help us out later
+# Now we just need a CEO for all the team leads to report to. Set their manager as themselves to help us out later. We need to make sure to include all the other information in the DF that we just generated, namely `rank` and `manager`. Here let's also set the CEO as reporting to themselves 
 
-# In[49]:
+# In[245]:
 
 
 CEO = make_person().__dict__ | {"team":"CEO", "title":"CEO", "status":"Full Time"}
@@ -255,32 +339,31 @@ people_df.loc[(people_df.manager == people_df.name) | CEO_mask ,"manager"]=CEO["
 people_df.loc[CEO_mask, "rank"] = people_df["rank"].max()+1
 
 
-# Cool .. this seems reasonably distributed?
+# Alright, we have something now. Does this seems reasonably distributed? Let's use `plotly` to explore our people's dimensions and get a feel for the data
 
-# In[51]:
+# In[246]:
 
 
+# let's flatten the nested pieces of the DataFrame (`people_df.location`)
 expanded_df = people_df.assign(**people_df.location.apply(pd.Series))
+expanded_df
 
 
-# In[104]:
+# In[247]:
 
 
 import plotly.express as px
-fig = px.bar(expanded_df, x="title", color="team", hover_data=["team","tz","city"], facet_col="country", template="plotly_dark")
 
+fig = px.bar(
+    expanded_df,
+    x="title",
+    color="team",
+    hover_name="name",
+    hover_data=["team", "tz", "city","manager","languages"],
+    facet_col="country",
+    template="plotly_dark",
+)
 fig.update_xaxes(matches=None, title_text=None)
-
-
-# Let's also make our `set` columns `list`s, for less future headaches:
-
-# In[1]:
-
-
-df = expanded_df
-for column in df.columns[(df.sample(100, replace=True).applymap(type) == set).any(axis=0)]:
-    print(f"Coercing column '{column}' to `list`")
-    df.loc[~df[column].isna(), column] = df.loc[~df[column].isna(),column].apply(list)
 
 
 # In[ ]:
@@ -290,6 +373,8 @@ for column in df.columns[(df.sample(100, replace=True).applymap(type) == set).an
 
 
 # # Understanding People with Network Graphs in Python
+# 
+# Now we can really start
 
 # ## NetworkX
 # 
@@ -297,7 +382,7 @@ for column in df.columns[(df.sample(100, replace=True).applymap(type) == set).an
 # 
 # NetworkX provides an easy-to-use, *fast*, graph framework to represent relationships in-memory
 
-# In[109]:
+# In[135]:
 
 
 import networkx as nx
@@ -307,7 +392,7 @@ G = nx.Graph()
 
 # It's easy to load in data one at a time
 
-# In[110]:
+# In[136]:
 
 
 G.add_node("Me", type="person", languages=["Python"])
@@ -315,7 +400,7 @@ G.add_node("Me", type="person", languages=["Python"])
 
 # Or from an iterable object
 
-# In[111]:
+# In[137]:
 
 
 G.add_nodes_from((
@@ -326,28 +411,51 @@ G.add_nodes_from((
 
 # Now we can look at the new data structure and play around with it:
 
-# In[112]:
+# In[138]:
 
 
 G.nodes() # show all the node labels
 
 
-# In[113]:
+# In[139]:
 
 
 G.nodes(data=True) # show all attributes in nodes
 
 
-# In[114]:
+# In[140]:
 
 
 G.nodes(data="languages") # show a specific attribute
 
 
-# In[115]:
+# In[141]:
 
 
 G.add_edge("Me","You", label="friends") # add an edge connecting two nodes ...
+G.add_edge("You","Them", label="friends") # add an edge connecting two nodes ...
+
+
+# There are lots of common and complex graph analysis functions available to make the most of the data structure 
+
+# In[142]:
+
+
+nx.shortest_path(G, source="Me", target="Them") # find paths between nodes through edges
+
+
+# In[143]:
+
+
+G.adj # find adjacent nodes
+
+
+# And visualizing is built-in with `matplotlib`. We will pretty this up later with `plotly`
+
+# In[144]:
+
+
+nx.draw(G, with_labels=True)
 
 
 # ### Some People Data
@@ -358,7 +466,7 @@ G.add_edge("Me","You", label="friends") # add an edge connecting two nodes ...
 # 
 # Now we're ready to define and populate the network graph. NetworkX provides helpful methods to populate the structure from an iterable. Here we massage our list of `people` a bit in order to give a unique name to each *node* in the graph:
 
-# In[117]:
+# In[146]:
 
 
 G = nx.Graph() # a simple undirected graph
@@ -370,31 +478,36 @@ G.nodes(data=True) # we can look at the contents (which should be very familiar!
 # 
 # Graphs lends themselves well to visual representations. NetworkX also makes this easy to do by tapping into Python's workhorse plotting library, `matplotlib`. We will revisit this later with a more dynamic + interactive approach to visualizing, but for the moment this is the fastest way to get things on paper
 
-# In[118]:
+# In[148]:
 
 
 import matplotlib.pyplot as plt
-nx.draw_networkx(G, with_labels=False)
+nx.draw(G, with_labels=False)
 
 
 # Let's add a bit of color to this by mapping colors to the `person.team`. Pick any colorscale from `px.colors` (or make your own!). Generally the *qualitative* colors look nice, anything designed for *categorical* data 
 
-# In[119]:
+# In[149]:
 
 
 colors = dict(zip(people_df.team.unique(),px.colors.qualitative.Vivid))
 colors
 
 
-# Now we can determine what the color should be for each node and pass that into the `nx.draw` call as a list of `node_color`. The easiest way to do this is to use `G.nodes(data=...)` for the attribute you want to extract, which will give you a map from each node to that attribute
-
-# In[120]:
+# In[150]:
 
 
+# here are some helpful helpers to translate colors
 def rgb_to_hex(r, g, b):
     return f'#{r:02x}{g:02x}{b:02x}'
 def rgb_string_to_tuple(rgb:str) -> tuple[int,int,int]:
     return tuple(int(c) for c in rgb.replace("rgb(","").replace(")","").split(","))
+
+
+# Now we can determine what the color should be for each node and pass that into the `nx.draw` call as a list of `node_color`. The easiest way to do this is to use `G.nodes(data=...)` for the attribute you want to extract, which will give you a map from each node to that attribute. `nx` allows you to iterate
+
+# In[151]:
+
 
 node_colors = [rgb_to_hex(*rgb_string_to_tuple(colors[team])) for _,team in G.nodes(data="team")]
 nx.draw(G, node_color=node_colors)
@@ -404,7 +517,7 @@ nx.draw(G, node_color=node_colors)
 # 
 # Be sure to only add edges that reference nodes that exist
 
-# In[121]:
+# In[152]:
 
 
 G.add_edges_from(G.nodes(data="manager"), label="manager", manager=True)
@@ -412,27 +525,25 @@ G.add_edges_from(G.nodes(data="manager"), label="manager", manager=True)
 
 # Now this should look a bit more sensible
 
-# In[122]:
+# In[153]:
 
 
 nx.draw(G, node_color=node_colors)
 
 
-# To view more details of the plot, it's useful to switch to an interactive plotting library like `plotly`. Here we provide a helper function for this:
+# To view more details of the plot, it's useful to switch to an interactive plotting library like `plotly`. Here we provide a helper function for this, but by no means is this perfect/optimized
 
-# In[123]:
+# In[154]:
 
 
-import plotly.express as px
-import plotly.graph_objects as go
 import pandas as pd
+import plotly.express as px
 
 
-# In[124]:
+# In[155]:
 
 
 import plotly.graph_objects as go
-from dataclasses import is_dataclass
 def px_plot_network_graph_nodes(G:nx.Graph, *, layout=None, **pxkwargs) -> go.Figure:
     # generate the x/y coordinates to represent the graph
     positions = (layout or nx.spring_layout(G))
@@ -454,7 +565,17 @@ def px_plot_network_graph_nodes(G:nx.Graph, *, layout=None, **pxkwargs) -> go.Fi
     )
     return fig
 
+
 def px_plot_nx(G:nx.Graph, *, layout=nx.spring_layout, with_edges=False, **nodekwargs) -> go.Figure:
+    """Draw a graph using ``plotly``
+
+    Kwargs are passed through to `px.scatter` and can be used to control the attributes that 
+    map ``color``, ``size``, ``facet_row``, ... to attributes in the graph nodes
+    
+    Notes
+    -----
+    Rendering ``with_edges`` is expensive and should be avoided during exploratory plotting
+    """
     # Generate positions, edges 
     nodes = layout(G)
     edges = [{
@@ -483,18 +604,37 @@ def px_plot_nx(G:nx.Graph, *, layout=nx.spring_layout, with_edges=False, **nodek
 # 
 # **Note: plotting `with_edges=True` is quite expensive, try toggling it off if you find it bothersome**
 
-# In[125]:
+# In[130]:
 
 
 from functools import partial
-# layout = partial(nx.spring_layout,k=0.2, iterations=20) # or customize how the layout is generated
-px_plot_nx(G, color="country", hover_name="name", template="plotly_dark")#,text="label")
+
+layout = (
+    nx.spring_layout
+)  # partial(nx.spring_layout,k=0.1, iterations=20) # or customize how the layout is generated
+px_plot_nx(
+    G,
+    color="country",
+    layout=layout,
+    with_edges=False,
+    hover_name="name",
+    size="rank",
+    template="plotly_dark",
+)  # ,text="label")
 
 
-# In[126]:
+# In[131]:
 
 
-px_plot_nx(G, color="country", hover_name="name", size="rank", template="plotly_dark")#,text="label")
+px_plot_nx(
+    G,
+    color="team",
+    layout=layout,
+    with_edges=False,
+    hover_name="name",
+    size="rank",
+    template="plotly_dark",
+)  # ,text="label")
 
 
 # In[ ]:
@@ -505,7 +645,7 @@ px_plot_nx(G, color="country", hover_name="name", size="rank", template="plotly_
 
 # Now we can take extra info (attributes) of each person (node) and map those onto nodes. This will allow us to connect people *through* common attributes, and not just through relationships like "reporting structure" or "hierarchy"
 
-# In[33]:
+# In[3]:
 
 
 from itertools import chain
@@ -513,7 +653,6 @@ from more_itertools import always_iterable
 
 def add_nodes_from_attributes(G: nx.Graph, *, attribute:str, default=[], flag:str):
     attributes = {person:attribute for person, attribute in G.nodes(data=attribute, default=default) if attribute}
-    print(attributes)
     for attr in set(chain.from_iterable((always_iterable(value) for value in attributes.values()))):
         if attr:
             G.add_node(attr, **{flag: True, "type":flag})
@@ -525,7 +664,7 @@ add_nodes_from_attributes(G, attribute="tz", flag="timezone", default="")
 
 # Let's add the edges in now connecting people to the app/language nodes!
 
-# In[34]:
+# In[4]:
 
 
 from more_itertools import always_iterable
@@ -541,7 +680,7 @@ def add_edges_from_attributes(G:nx.Graph, *, attribute:str, weight:int=1):
                 G.add_edge(name, attr, weight=weight, **{attribute:True})
 
 
-# In[35]:
+# In[5]:
 
 
 add_edges_from_attributes(G, attribute="languages")
@@ -552,10 +691,10 @@ add_edges_from_attributes(G, attribute="tz")
 
 # This should look interesting! We used a **force-directed layout** to draw the graph, meaning that the edges between nodes are **pulling** the nodes together in order until they find an equilibrium point. This also takes into account the weights we applied to edges, with higher weighed edges behaving like springs with higher spring constants
 
-# In[9]:
+# In[6]:
 
 
-px_plot_nx(G, height=800, hover_name="label", color="team", size="rank", with_edges=True, template="plotly_dark")
+px_plot_nx(G, height=800, hover_name="label", color="team", size="rank", with_edges=False, template="plotly_dark")
 
 
 # ## Extras
@@ -616,7 +755,7 @@ px_plot_nx(G, height=800, hover_name="label", color="team", size="rank", with_ed
 
 # ## A Very Simple ``Dash`` App
 
-# In[48]:
+# In[2]:
 
 
 from dash import Dash, html, Output, Input
@@ -626,7 +765,7 @@ app = Dash()
 app.layout = html.Div([
     html.H1("A Simple App", id="title"),
     html.P("Structure things like you would in HTML"),
-    html.Button("Click me to do something", id="button")
+    html.Button("Click me to do something", id="button"),
 ])
 
 @app.callback(
@@ -649,48 +788,109 @@ def update_title_on_buttonclick(n_clicks):
 
 
 import dash_bootstrap_components as dbc
+from dash import dcc
 
-app = Dash(external_stylesheets=[dbc.themes.SKETCHY])
+app = Dash(external_stylesheets=[dbc.themes.DARKLY])
 
-app.layout = html.Div([
-    dbc.NavbarSimple(brand="Communities in Network Graphs"),
-    dbc.Container([
-        dbc.Row([
-            dbc.Col(
-                "Hello", width=3
-            ),
-            dbc.Col("Everyone", width=9)
-        ])
-    ])
-])
+app.layout = html.Div(
+    [
+        dbc.NavbarSimple(brand="Communities in Network Graphs"),
+        dbc.Container(
+            [
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [
+                                html.H3("Customize Lorems"),
+                                dbc.InputGroup(
+                                    [
+                                        dbc.InputGroupText("N Paras: "),
+                                        dbc.Input(
+                                            value=2, type="number", id="n_paragraphs"
+                                        ),
+                                    ]
+                                ),
+                                dbc.InputGroup(
+                                    [
+                                        dbc.InputGroupText("Color: "),
+                                        dcc.Dropdown(
+                                            value=None,
+                                            options=[
+                                                {"label": o, "value": f"var(--bs-{o})"}
+                                                for o in [
+                                                    "red",
+                                                    "green",
+                                                    "blue",
+                                                    "black",
+                                                    "purple"
+                                                ]
+                                            ],
+                                            id="color",
+                                            style={"color":"black"} # play nice (ish) with dark themes
+                                        ),
+                                    ]
+                                ),
+                            ],
+                            width=4,
+                        ),
+                        dbc.Col([html.H2("Lorems Ipsum"), html.P(id="paragraph")], width=8),
+                    ]
+                )
+            ]
+        ),
+    ]
+)
 
-#app.run()
+
+@app.callback(
+    {"text": Output("paragraph", "children"), "style": Output("paragraph", "style")},
+    Input("n_paragraphs", "value"),
+    Input("color", "value"),
+)
+def generate_paragraphs(n, color):
+    print(n, color)
+    return dict(text=[html.P(p) for p in fake.paragraphs(nb=n)], style={"color": color})
+
+
+#app.run(debug=False)
 
 
 # ## Cytoscape
 # 
 # Now we can use the `dash-cytoscape` package to display our graph. Let's start with wireframe layout and then add in the functionality we need:
 
-# In[41]:
+# In[5]:
 
+
+import pandas as pd
+import networkx as nx
+
+def create_graph(people_df: pd.DataFrame, attributes:list[str]) -> nx.DiGraph:
+    G = nx.DiGraph()
+    G.add_nodes_from(((person["name"], person) for person in expanded_df.to_dict(orient="records")), person=True, type="person")
+    
+    for attribute in attributes:
+        if attribute != "manager":
+            add_nodes_from_attributes(G, attribute=attribute, flag=f"{attribute}_flag")
+        add_edges_from_attributes(G, attribute=attribute)
+
+    return G
 
 def create_elements(attributes: list[str]=[]) -> list[dict]:
     """Generate a graph with connecting attributes and serialize it as cytoscape elements"""
 
-
-# In[42]:
-
-
-elements = (
-    nx.cytoscape_data(G)["elements"]["nodes"]
-    + nx.cytoscape_data(G)["elements"]["edges"]
-)
+    G = create_graph(people_df=people_df, attributes=attributes)
+    elements = (
+        nx.cytoscape_data(G)["elements"]["nodes"]
+        + nx.cytoscape_data(G)["elements"]["edges"]
+    )
+    return elements
 
 
-# In[43]:
+# In[16]:
 
 
-def stylesheet_(focus:str=CEO["name"], theme:str="light"):
+def stylesheet_(focus:str=CEO["name"], theme:str="light", color:str=None, show_names:bool=False):
     dark = theme == "dark"
     return [
     {
@@ -704,6 +904,7 @@ def stylesheet_(focus:str=CEO["name"], theme:str="light"):
         "selector": "edge",
         "style": {
             "line-color": "lightgrey" if dark else "darkgrey",
+            "color": "lightgrey" if dark else "darkgrey",
             "curve-style": "bezier",
             "label": "data(label)",
             "width": 1,
@@ -720,7 +921,7 @@ def stylesheet_(focus:str=CEO["name"], theme:str="light"):
     {
         "selector": "node[?person]",
         "style": {
-            "label": "data(label)",
+            "label": "data(name)" if show_names else "",
             "background-color": "lightgreen" if dark else "green",
             "width": 25,
             "height": 25,            
@@ -728,16 +929,7 @@ def stylesheet_(focus:str=CEO["name"], theme:str="light"):
         },
     },
     {
-        "selector": "node[?language]",
-        "style": {
-            "label": "data(name)",
-            "background-color": "white" if dark else "black",
-            "width": 5,
-            "height": 5,
-        },
-    },
-    {
-        "selector": "node[?timezone]",
+        "selector": "node[!person]",
         "style": {
             "label": "data(name)",
             "background-color": "white" if dark else "black",
@@ -756,25 +948,29 @@ def stylesheet_(focus:str=CEO["name"], theme:str="light"):
             "z-index":10            
         }
     },
-    {
-        "selector": "node[?app]",
-        "style": {"label": "data(name)", "width": 5, "height": 5},
-    },
+    *node_color_stylesheet(attribute=color)
 ]
 
+def node_color_stylesheet(attribute:str) -> dict:
+    if not attribute:
+        return []
+    #colorscale = [f"var(--bs-{color})" for color in ["red","green","blue","pink","purple","yellow","indigo","cyan","orange","teal"]]
+    colorscale = [color for color in ["red","green","blue","pink","purple","yellow","indigo","cyan","orange","teal"]]
+    colors = dict(zip(expanded_df[attribute].unique(),colorscale))
+    return [
+        {"selector": f"node[{attribute}='{value}']", "style":{"background-color":color}}
+        for value,color in colors.items()
+    ]
 
-# In[47]:
+
+# In[17]:
 
 
 from dash import dash, html, dcc, Input, Output
-
-# from jupyter_dash import JupyterDash
 import dash_cytoscape as cyto
 
-# JupyterDash.infer_jupyter_proxy_config()
 cyto.load_extra_layouts()
-dashboard = dash.Dash(__name__)
-# dashboard = JupyterDash(__name__)
+dashboard = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 
 cyto_layout = {
     "name": "cose",
@@ -796,6 +992,40 @@ cyto_layout = {
     "nodeDimensionsIncludeLabels": True,
 }
 
+dropdowns = [
+    dbc.InputGroup(
+        [
+            dbc.InputGroupText("Attributes: "),
+            dcc.Dropdown(
+                value=None,
+                options=[{"label": o, "value": o} for o in expanded_df.columns],
+                id="attributes",
+                placeholder="attrs as nodes",
+                style={
+                    "color": "black",
+                    "min-width": "75px",
+                },  # play nice (ish) with dark themes
+                multi=True,
+            ),
+        ]
+    ),
+    dbc.InputGroup(
+        [
+            dbc.InputGroupText("Color: "),
+            dcc.Dropdown(
+                value=None,
+                options=[{"label": o, "value": o} for o in expanded_df.columns],
+                id="color",
+                placeholder="attr as colors",
+                style={
+                    "color": "black",
+                    "min-width": "75px",
+                },  # play nice (ish) with dark themes
+            ),
+        ]
+    ),
+]
+
 
 def layout():
     network = cyto.Cytoscape(
@@ -803,10 +1033,50 @@ def layout():
         layout=cyto_layout,
         responsive=True,
         style={"width": "100%", "height": "800px"},
-        elements=elements,
-        stylesheet=stylesheet_(),
+        elements=create_elements(attributes=["team", "city"]),
+        stylesheet=stylesheet_(theme="dark", color="country"),
     )
-    return html.Div([html.H1("The Network"), network])
+    return html.Div(
+        [
+            dbc.NavbarSimple(
+                [
+                    dbc.NavItem(
+                        dbc.NavLink(
+                            "PyData Seattle 2023",
+                            href="https://pydata.org/seattle2023/schedule/",
+                        )
+                    ),
+                    dbc.NavItem(
+                        dbc.NavLink(
+                            "Network Graph Tutorial",
+                            href="https://lucasdurand.xyz/network-graph-tutorial",
+                        )
+                    ),
+                    dbc.NavItem(
+                        dbc.NavLink(
+                            "Talk",
+                            href="https://seattle2023.pydata.org/cfp/talk/83P9D7/",
+                        )
+                    ),
+                ],
+                brand="Peer Finder",
+            ),
+            dbc.Container(
+                [
+                    dbc.Row(
+                        [
+                            dbc.Col([html.H3("[TODO] Draw Graph by Attributes"),
+                                *dropdowns],
+                                width=4,
+                                style={"background-color": "var(--bs-dark)"},
+                            ),
+                            dbc.Col(network, width=8),
+                        ]
+                    )
+                ]
+            ),
+        ]
+    )
 
 
 dashboard.layout = layout
@@ -819,6 +1089,7 @@ if __name__ == "__main__":
 
 
 app = dashboard.server
+print("app loaded")
 
 
 # ## Extras
@@ -828,3 +1099,5 @@ app = dashboard.server
 # * Add a dropdown to choose how to colour nodes
 #     * Pick an attribute to color on people nodes like plotly
 #     * Color attribute nodes more statically
+
+# 
