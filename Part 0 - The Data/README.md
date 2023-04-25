@@ -18,4 +18,4 @@ This whole section can be skimmed, but the goal here is to generate usable data 
     * Executives in headquarters location (with exceptions)
     * *Managers* should all be `"Full Time"`
 * Merge logic back into `Faker` so that we can keep track of things like unique values and simplify the interface
-* What other kinds of organizations can we model?
+* What other kinds of organizations can we model? Store each set of generators as a separate `Faker` locale
