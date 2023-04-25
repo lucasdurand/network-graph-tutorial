@@ -755,7 +755,7 @@ px_plot_nx(G, height=800, hover_name="label", color="team", size="rank", with_ed
 
 # ## A Very Simple ``Dash`` App
 
-# In[100]:
+# In[2]:
 
 
 from dash import Dash, html, Output, Input
@@ -784,7 +784,7 @@ def update_title_on_buttonclick(n_clicks):
 # 
 # Let's use bootstrap to spruce this up a bit
 
-# In[101]:
+# In[3]:
 
 
 import dash_bootstrap_components as dbc
@@ -859,7 +859,7 @@ def generate_paragraphs(n, color):
 # 
 # Now we can use the `dash-cytoscape` package to display our graph. Let's start with wireframe layout and then add in the functionality we need:
 
-# In[ ]:
+# In[5]:
 
 
 import pandas as pd
@@ -887,7 +887,7 @@ def create_elements(attributes: list[str]=[]) -> list[dict]:
     return elements
 
 
-# In[147]:
+# In[16]:
 
 
 def stylesheet_(focus:str=CEO["name"], theme:str="light", color:str=None, show_names:bool=False):
@@ -929,16 +929,7 @@ def stylesheet_(focus:str=CEO["name"], theme:str="light", color:str=None, show_n
         },
     },
     {
-        "selector": "node[?language_flag]",
-        "style": {
-            "label": "data(name)",
-            "background-color": "white" if dark else "black",
-            "width": 5,
-            "height": 5,
-        },
-    },
-    {
-        "selector": "node[?tz_flag]",
+        "selector": "node[!person]",
         "style": {
             "label": "data(name)",
             "background-color": "white" if dark else "black",
@@ -957,14 +948,6 @@ def stylesheet_(focus:str=CEO["name"], theme:str="light", color:str=None, show_n
             "z-index":10            
         }
     },
-    {
-        "selector": "node[?app_flag]",
-        "style": {"label": "data(name)", "width": 5, "height": 5},
-    },
-    {
-        "selector": "node[?team_flag]",
-        "style": {"label": "data(name)", "width": 5, "height": 5},
-    },
     *node_color_stylesheet(attribute=color)
 ]
 
@@ -980,7 +963,7 @@ def node_color_stylesheet(attribute:str) -> dict:
     ]
 
 
-# In[159]:
+# In[17]:
 
 
 from dash import dash, html, dcc, Input, Output
@@ -1082,8 +1065,8 @@ def layout():
                 [
                     dbc.Row(
                         [
-                            dbc.Col(
-                                dropdowns,
+                            dbc.Col([html.H3("[TODO] Draw Graph by Attributes"),
+                                *dropdowns],
                                 width=4,
                                 style={"background-color": "var(--bs-dark)"},
                             ),
@@ -1116,3 +1099,5 @@ print("app loaded")
 # * Add a dropdown to choose how to colour nodes
 #     * Pick an attribute to color on people nodes like plotly
 #     * Color attribute nodes more statically
+
+# 
