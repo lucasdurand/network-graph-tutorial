@@ -2,6 +2,8 @@
 
 *A hands-on tutorial [scheduled](https://seattle2023.pydata.org/cfp/talk/83P9D7/) for [PyData Seattle 2023](https://pydata.org/seattle2023/schedule/) to build a [fun graph app](https://community-networks-pydata.uc.r.appspot.com/)!*
 
+**Watch the video - [it really happened!](https://youtu.be/n0xe7nHd3QA)**
+
 ## Introduction -- People?!
 
 **People are hard to understand, developers doubly so! In this tutorial, we will explore how communities form in organizations to develop a better solution than "The Org Chart". We will walk through using a few key Python libraries in the space, develop a toolkit for Clustering Attributed Graphs (more on that later) and build out an extensible interactive dashboard application that promises to take your legacy HR reporting structure to the next level.**
