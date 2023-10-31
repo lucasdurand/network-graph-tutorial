@@ -23,6 +23,7 @@ faker = "*"
 matplotlib = "*"
 more-itertools = "*"
 gunicorn = {version = "*", sys_platform = "== 'linux'"}
+pyvis = "*"
 
 [requires]
 python_version = "3.11"

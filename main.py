@@ -16,7 +16,7 @@
 # 
 # Let's generate some fake data! https://faker.readthedocs.io/en/master/
 
-# In[229]:
+# In[1]:
 
 
 from faker import Faker
@@ -27,7 +27,7 @@ fake.profile() # lots of great stuff in here!
 
 # We can also do things like ensure uniqueness for individual entries across all entries
 
-# In[230]:
+# In[2]:
 
 
 from faker.exceptions import UniquenessException
@@ -40,7 +40,7 @@ except UniquenessException:
 
 # Try generating a few people and see if it looks like a good representation of our organization
 
-# In[231]:
+# In[3]:
 
 
 ...
@@ -51,7 +51,7 @@ except UniquenessException:
 
 # First, a few more interesting features: we can also register new `providers` if anything is missing. If needed these can be customized for different locales 
 
-# In[232]:
+# In[4]:
 
 
 from faker.providers import DynamicProvider
@@ -68,7 +68,7 @@ fake.employment()
 
 # We can customize this further by using the `Faker.BaseProvider`
 
-# In[233]:
+# In[5]:
 
 
 # first, import a similar Provider or use the default one
@@ -94,7 +94,7 @@ fake.employment()
 
 # To ground us in this task, let's define a new `Person` object that we can fill up with info (and a few other objects):
 
-# In[234]:
+# In[6]:
 
 
 from dataclasses import dataclass, field
@@ -126,13 +126,13 @@ class Person:
     location: Location = None
 
 
-# In[235]:
+# In[7]:
 
 
 Person(name="Employee #1",hire_date=datetime.date.today(), status="Full Time", location=Location("New York", "EST", "USA"))
 
 
-# In[236]:
+# In[8]:
 
 
 import numpy as np
@@ -161,7 +161,7 @@ def choose_a_few(
 
 # Now to make some people. Let's re-use whatever we can from `Faker` and then add some more of our own fields. We can also extend where needed to keep our code clear and consistent:
 
-# In[237]:
+# In[9]:
 
 
 class ProgrammingLanguages(BaseProvider):    
@@ -181,7 +181,7 @@ class ProgrammingLanguages(BaseProvider):
 fake.add_provider(ProgrammingLanguages)
 
 
-# In[238]:
+# In[10]:
 
 
 def make_person() -> Person:
@@ -200,7 +200,7 @@ make_person()
 
 # Now we can generate more complex attributes in a smart way. Let's set up some rules about where offices are, what teams are in which offices, then pick titles based on other info (e.g. Developers probably know at least one language ... )
 
-# In[239]:
+# In[11]:
 
 
 TEAM_TITLES:dict[str,list[str]] = {
@@ -256,7 +256,7 @@ title_city_team()
 
 # After running this we should have a better balanced org in terms of region + titles. Then we just need to add the connections in -- i.e. who's the boss?!
 
-# In[240]:
+# In[12]:
 
 
 def make_person() -> Person:
@@ -264,14 +264,14 @@ def make_person() -> Person:
     technical = 1 if "Engineer" in title_city_team_["title"] else 0
     return Person(
         name = fake.name(),
-        hire_date = fake.date_between(start_date="-3y", end_date="today"),
+        hire_date = fake.date_between(start_date="-3y", end_date="today").strftime("%Y%m%d"),
         status = fake.employment(),
         languages = fake.programming_languages(),
         **title_city_team_,
     )
 
 
-# In[241]:
+# In[13]:
 
 
 import pandas as pd
@@ -286,7 +286,7 @@ people_df.head()
 # * We already ordered `TEAM_TITLES` based on *rank*
 # * Team leads should be listed as reporting to themselves (for now)
 
-# In[242]:
+# In[14]:
 
 
 # calculate team ranks
@@ -297,7 +297,7 @@ people_df = people_df.sort_values(by=["team","rank"])
 people_df.sample(3)
 
 
-# In[244]:
+# In[15]:
 
 
 # determine supervisor
@@ -328,7 +328,7 @@ people_df.sample(5)
 
 # Now we just need a CEO for all the team leads to report to. Set their manager as themselves to help us out later. We need to make sure to include all the other information in the DF that we just generated, namely `rank` and `manager`. Here let's also set the CEO as reporting to themselves 
 
-# In[245]:
+# In[16]:
 
 
 CEO = make_person().__dict__ | {"team":"CEO", "title":"CEO", "status":"Full Time"}
@@ -341,7 +341,7 @@ people_df.loc[CEO_mask, "rank"] = people_df["rank"].max()+1
 
 # Alright, we have something now. Does this seems reasonably distributed? Let's use `plotly` to explore our people's dimensions and get a feel for the data
 
-# In[246]:
+# In[17]:
 
 
 # let's flatten the nested pieces of the DataFrame (`people_df.location`)
@@ -349,7 +349,7 @@ expanded_df = people_df.assign(**people_df.location.apply(pd.Series))
 expanded_df
 
 
-# In[247]:
+# In[18]:
 
 
 import plotly.express as px
@@ -382,7 +382,7 @@ fig.update_xaxes(matches=None, title_text=None)
 # 
 # NetworkX provides an easy-to-use, *fast*, graph framework to represent relationships in-memory
 
-# In[135]:
+# In[2]:
 
 
 import networkx as nx
@@ -392,7 +392,7 @@ G = nx.Graph()
 
 # It's easy to load in data one at a time
 
-# In[136]:
+# In[3]:
 
 
 G.add_node("Me", type="person", languages=["Python"])
@@ -400,7 +400,7 @@ G.add_node("Me", type="person", languages=["Python"])
 
 # Or from an iterable object
 
-# In[137]:
+# In[4]:
 
 
 G.add_nodes_from((
@@ -411,25 +411,25 @@ G.add_nodes_from((
 
 # Now we can look at the new data structure and play around with it:
 
-# In[138]:
+# In[5]:
 
 
 G.nodes() # show all the node labels
 
 
-# In[139]:
+# In[6]:
 
 
 G.nodes(data=True) # show all attributes in nodes
 
 
-# In[140]:
+# In[7]:
 
 
 G.nodes(data="languages") # show a specific attribute
 
 
-# In[141]:
+# In[8]:
 
 
 G.add_edge("Me","You", label="friends") # add an edge connecting two nodes ...
@@ -438,13 +438,13 @@ G.add_edge("You","Them", label="friends") # add an edge connecting two nodes ...
 
 # There are lots of common and complex graph analysis functions available to make the most of the data structure 
 
-# In[142]:
+# In[9]:
 
 
 nx.shortest_path(G, source="Me", target="Them") # find paths between nodes through edges
 
 
-# In[143]:
+# In[10]:
 
 
 G.adj # find adjacent nodes
@@ -452,7 +452,7 @@ G.adj # find adjacent nodes
 
 # And visualizing is built-in with `matplotlib`. We will pretty this up later with `plotly`
 
-# In[144]:
+# In[11]:
 
 
 nx.draw(G, with_labels=True)
@@ -466,19 +466,25 @@ nx.draw(G, with_labels=True)
 # 
 # Now we're ready to define and populate the network graph. NetworkX provides helpful methods to populate the structure from an iterable. Here we massage our list of `people` a bit in order to give a unique name to each *node* in the graph:
 
-# In[146]:
+# In[16]:
+
+
+from more_itertools import take
+
+
+# In[18]:
 
 
 G = nx.Graph() # a simple undirected graph
 G.add_nodes_from(((person["name"], person) for person in expanded_df.to_dict(orient="records")), person=True, type="person")
-G.nodes(data=True) # we can look at the contents (which should be very familiar!)
+take(3, G.nodes(data=True)) # we can look at the contents (which should be very familiar!)
 
 
 # ### Visualizing
 # 
 # Graphs lends themselves well to visual representations. NetworkX also makes this easy to do by tapping into Python's workhorse plotting library, `matplotlib`. We will revisit this later with a more dynamic + interactive approach to visualizing, but for the moment this is the fastest way to get things on paper
 
-# In[148]:
+# In[19]:
 
 
 import matplotlib.pyplot as plt
@@ -487,14 +493,14 @@ nx.draw(G, with_labels=False)
 
 # Let's add a bit of color to this by mapping colors to the `person.team`. Pick any colorscale from `px.colors` (or make your own!). Generally the *qualitative* colors look nice, anything designed for *categorical* data 
 
-# In[149]:
+# In[20]:
 
 
 colors = dict(zip(people_df.team.unique(),px.colors.qualitative.Vivid))
 colors
 
 
-# In[150]:
+# In[21]:
 
 
 # here are some helpful helpers to translate colors
@@ -506,7 +512,7 @@ def rgb_string_to_tuple(rgb:str) -> tuple[int,int,int]:
 
 # Now we can determine what the color should be for each node and pass that into the `nx.draw` call as a list of `node_color`. The easiest way to do this is to use `G.nodes(data=...)` for the attribute you want to extract, which will give you a map from each node to that attribute. `nx` allows you to iterate
 
-# In[151]:
+# In[22]:
 
 
 node_colors = [rgb_to_hex(*rgb_string_to_tuple(colors[team])) for _,team in G.nodes(data="team")]
@@ -517,7 +523,7 @@ nx.draw(G, node_color=node_colors)
 # 
 # Be sure to only add edges that reference nodes that exist
 
-# In[152]:
+# In[23]:
 
 
 G.add_edges_from(G.nodes(data="manager"), label="manager", manager=True)
@@ -525,7 +531,7 @@ G.add_edges_from(G.nodes(data="manager"), label="manager", manager=True)
 
 # Now this should look a bit more sensible
 
-# In[153]:
+# In[24]:
 
 
 nx.draw(G, node_color=node_colors)
@@ -533,14 +539,14 @@ nx.draw(G, node_color=node_colors)
 
 # To view more details of the plot, it's useful to switch to an interactive plotting library like `plotly`. Here we provide a helper function for this, but by no means is this perfect/optimized
 
-# In[154]:
+# In[25]:
 
 
 import pandas as pd
 import plotly.express as px
 
 
-# In[155]:
+# In[26]:
 
 
 import plotly.graph_objects as go
@@ -604,7 +610,7 @@ def px_plot_nx(G:nx.Graph, *, layout=nx.spring_layout, with_edges=False, **nodek
 # 
 # **Note: plotting `with_edges=True` is quite expensive, try toggling it off if you find it bothersome**
 
-# In[130]:
+# In[27]:
 
 
 from functools import partial
@@ -637,6 +643,107 @@ px_plot_nx(
 )  # ,text="label")
 
 
+# ## Pyvis
+# 
+# Alas -- there is another way to visualize our `networkx` graph using `VisJS` (via [pyvis](https://pyvis.readthedocs.io/en/latest/introduction.html))
+# 
+# Unfortunately the output [won't render in VSCode](https://github.com/microsoft/vscode-jupyter/issues/12689) ... but if you're in Jupyter or view the html file in a browser you're cooking
+
+# In[30]:
+
+
+from pyvis.network import Network
+nt = Network(notebook=True, cdn_resources="in_line", bgcolor="black")
+# populates the nodes and edges data structures
+nt.from_nx(G)
+nt.show('nx.html')
+
+
+# `pyvis` will prettify your graph for you if you include attributes:
+# * group: is this part of a group? It will be coloured as such
+# * title: hover text
+# * label: displayed under the node
+
+# So let's change our attribute name for the reserved keyword `title`
+
+# In[43]:
+
+
+H = G.copy()  # let's make a copy before mutating this
+# fix reserved names 
+nx.set_node_attributes(H, {name: _title for name, _title in G.nodes(data="title")}, "_title")
+
+
+# We can adjust our current graph to render useful information with a fun plotting function
+
+# In[37]:
+
+
+def nt_show(G: nx.Graph, color:str=None, title:str=None, label:str=None, size:str=None, legend:bool=True, **network_kwargs):
+    """Draw a graph using ``pyvis``
+
+    Parameters
+    ----------
+    color: str
+        the name of the attribute to color nodes by
+    title:str
+        the name of the attribute to generate hover data titles
+    label:str
+        the name of attribute to print text labels
+    legend:bool
+        whether to include a janky legend
+    size:str
+        the attribute to size nodes by
+    **network_kwargs
+        passed through to `pyvis.network.Network` and can be used to customize how the plot is rendered
+
+    """
+    H = G.copy()
+    nx.set_node_attributes(H, {name: color for name, color in G.nodes(data=color) if color}, "group")
+    nx.set_node_attributes(H, {name: title for name, title in G.nodes(data=title) if title}, "title")
+    nx.set_node_attributes(H, {name: label for name, label in G.nodes(data=label) if label}, "label")
+    nx.set_node_attributes(H, {name: size for name, size in G.nodes(data=size) if size}, "size")
+    if legend:
+        add_legend_nodes(H)        
+    default_kwargs = dict(notebook=True, cdn_resources="in_line")
+    nt = Network(**default_kwargs|network_kwargs)
+    nt.from_nx(H)
+    return nt.show("nx.html");
+
+
+def add_legend_nodes(G:nx.Graph):
+    # Add Legend Nodes
+    step = 100
+    x = -500 * 2
+    y = -500 * 2
+    groups = set(group for _, group in G.nodes(data="group"))
+    legend_nodes = [
+        (
+            group, 
+            {
+                'group': group, 
+                'label': group,
+                'size': 50, 
+                # 'fixed': True, # So that we can move the legend nodes around to arrange them better
+                'physics': False, 
+                'x': f'{x}px', 
+                'y': f'{y + legend_node*step}px',
+                'shape': 'box', 
+                'widthConstraint': step * 2, 
+                'font': {'size': 30}
+            }
+        )
+        for legend_node, group in enumerate(groups) if group
+    ]
+    G.add_nodes_from(legend_nodes)
+
+
+# In[38]:
+
+
+nt_show(H, color="team", label="_title", title="city", bgcolor="black")
+
+
 # In[ ]:
 
 
@@ -645,7 +752,7 @@ px_plot_nx(
 
 # Now we can take extra info (attributes) of each person (node) and map those onto nodes. This will allow us to connect people *through* common attributes, and not just through relationships like "reporting structure" or "hierarchy"
 
-# In[3]:
+# In[2]:
 
 
 from itertools import chain
@@ -658,13 +765,13 @@ def add_nodes_from_attributes(G: nx.Graph, *, attribute:str, default=[], flag:st
             G.add_node(attr, **{flag: True, "type":flag})
         
 add_nodes_from_attributes(G, attribute="languages", flag="language")
-#add_nodes_from_attributes(G, attribute="apps", flag="app")
+add_nodes_from_attributes(G, attribute="city", flag="city")
 add_nodes_from_attributes(G, attribute="tz", flag="timezone", default="")
 
 
 # Let's add the edges in now connecting people to the app/language nodes!
 
-# In[4]:
+# In[3]:
 
 
 from more_itertools import always_iterable
@@ -680,30 +787,32 @@ def add_edges_from_attributes(G:nx.Graph, *, attribute:str, weight:int=1):
                 G.add_edge(name, attr, weight=weight, **{attribute:True})
 
 
-# In[5]:
+# In[4]:
 
 
 add_edges_from_attributes(G, attribute="languages")
 add_edges_from_attributes(G, attribute="tz")
-#add_edges_from_attributes(G, attribute="apps")
+add_edges_from_attributes(G, attribute="city")
 #add_edges_from_attributes(G, attribute="manager")
 
 
 # This should look interesting! We used a **force-directed layout** to draw the graph, meaning that the edges between nodes are **pulling** the nodes together in order until they find an equilibrium point. This also takes into account the weights we applied to edges, with higher weighed edges behaving like springs with higher spring constants
 
-# In[6]:
+# In[5]:
 
 
 px_plot_nx(G, height=800, hover_name="label", color="team", size="rank", with_edges=False, template="plotly_dark")
 
 
+# In[6]:
+
+
+nt_show(G, title="label", color="team", size="rank", bgcolor="black")
+
+
 # ## Extras
 # 
-# For the sake of the tutorial we are going to continue with a visual exploration of the graph, but we can also use computational methods. Here are a few jumping off points:
-# 
-# Let's use a few methods to investigate how the *people* nodes in the graph are connected and see if we can find clusters and *neighbourhoods*
-# 
-# We can look at just a "neighbourhood" around a person ... but this is currently unweighted, so we're just seeing anything 1 node away, instead of looking at a more complete view of "closeness"
+# We can visually look for closeness above, or do it algorithmically. An `ego_graph` will show you all of the other nodes that are within `radius` steps from yourself (through any edge)
 
 # ```python
 # someone = list(G.nodes)[0]
@@ -712,9 +821,10 @@ px_plot_nx(G, height=800, hover_name="label", color="team", size="rank", with_ed
 # nx.draw_networkx(ego, nodelist=ego_people)
 # ```
 
-# This information is also easy to recover frbom the Graph itself
+# This information is also easy to recover from the Graph itself
 
 # ```python
+# 
 # peoplenodes = nx.subgraph_view(ego, filter_node=just_people)
 # connectivity = nx.all_pairs_node_connectivity(ego, nbunch=peoplenodes)
 # connectivity
@@ -751,11 +861,17 @@ px_plot_nx(G, height=800, hover_name="label", color="team", size="rank", with_ed
 # friends[:2].person2
 # ```
 
+# In[ ]:
+
+
+
+
+
 # But this is the same approach (in spirit) to representing a graph as vectors in N-dimensional space (only here we do just 2-dim). A more common approach is to use `node2vec` and then look for closeness in the vectors
 
 # ## A Very Simple ``Dash`` App
 
-# In[2]:
+# In[10]:
 
 
 from dash import Dash, html, Output, Input
@@ -784,11 +900,13 @@ def update_title_on_buttonclick(n_clicks):
 # 
 # Let's use bootstrap to spruce this up a bit
 
-# In[3]:
+# In[11]:
 
 
 import dash_bootstrap_components as dbc
 from dash import dcc
+from faker import Faker
+fake = Faker()
 
 app = Dash(external_stylesheets=[dbc.themes.DARKLY])
 
@@ -857,9 +975,9 @@ def generate_paragraphs(n, color):
 
 # ## Cytoscape
 # 
-# Now we can use the `dash-cytoscape` package to display our graph. Let's start with wireframe layout and then add in the functionality we need:
+# Now we can use the `dash-cytoscape` package to display our graph. Let's start with a wireframe layout and then add in the functionality we need:
 
-# In[5]:
+# In[7]:
 
 
 import pandas as pd
@@ -887,7 +1005,7 @@ def create_elements(attributes: list[str]=[]) -> list[dict]:
     return elements
 
 
-# In[16]:
+# In[8]:
 
 
 def stylesheet_(focus:str=CEO["name"], theme:str="light", color:str=None, show_names:bool=False):
@@ -963,7 +1081,7 @@ def node_color_stylesheet(attribute:str) -> dict:
     ]
 
 
-# In[17]:
+# In[21]:
 
 
 from dash import dash, html, dcc, Input, Output
@@ -997,7 +1115,7 @@ dropdowns = [
         [
             dbc.InputGroupText("Attributes: "),
             dcc.Dropdown(
-                value=None,
+                value=["city","manager","team"],
                 options=[{"label": o, "value": o} for o in expanded_df.columns],
                 id="attributes",
                 placeholder="attrs as nodes",
@@ -1013,7 +1131,7 @@ dropdowns = [
         [
             dbc.InputGroupText("Color: "),
             dcc.Dropdown(
-                value=None,
+                value="country",
                 options=[{"label": o, "value": o} for o in expanded_df.columns],
                 id="color",
                 placeholder="attr as colors",
@@ -1033,8 +1151,6 @@ def layout():
         layout=cyto_layout,
         responsive=True,
         style={"width": "100%", "height": "800px"},
-        elements=create_elements(attributes=["team", "city"]),
-        stylesheet=stylesheet_(theme="dark", color="country"),
     )
     return html.Div(
         [
@@ -1065,7 +1181,7 @@ def layout():
                 [
                     dbc.Row(
                         [
-                            dbc.Col([html.H3("[TODO] Draw Graph by Attributes"),
+                            dbc.Col([html.H3("Draw Graph by Attributes"),
                                 *dropdowns],
                                 width=4,
                                 style={"background-color": "var(--bs-dark)"},
@@ -1080,6 +1196,21 @@ def layout():
 
 
 dashboard.layout = layout
+
+@dashboard.callback(
+    Output("network", "elements"),
+    Input("attributes", "value")
+)
+def update_graph(attributes:list):
+    return create_elements(attributes=attributes or [])
+
+@dashboard.callback(
+    Output("network", "stylesheet"),
+    Input("color", "value")
+)
+def update_stylesheet(color:str):
+    return stylesheet_(theme="dark", color=color)
+    
 
 if __name__ == "__main__":
     dashboard.run(port=16900, debug=True, use_reloader=False)
@@ -1096,8 +1227,13 @@ print("app loaded")
 # 
 # * Change node size based on `rank` using a calculation
 # * Customize the layout
+# * Add a legend to map colours to values
 # * Add a dropdown to choose how to colour nodes
 #     * Pick an attribute to color on people nodes like plotly
 #     * Color attribute nodes more statically
 
-# 
+# In[ ]:
+
+
+
+
