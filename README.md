@@ -1,6 +1,6 @@
 # Building an Interactive Network Graph to Understand Communities
 
-*A hands-on tutorial [scheduled](https://seattle2023.pydata.org/cfp/talk/83P9D7/) for [PyData Seattle 2023](https://pydata.org/seattle2023/schedule/) to build a [fun graph app](https://community-networks-pydata.uc.r.appspot.com/)!*
+*A hands-on tutorial originally given for [PyData Seattle 2023](https://seattle2023.pydata.org/cfp/talk/83P9D7/), then [PyData NYC 2023](https://nyc2023.pydata.org/cfp/talk/KXWQGC/) where we learn about people, put them into graphs, then build a [fun graph app](https://community-networks-pydata.uc.r.appspot.com/)!*
 
 ## Introduction -- People?!
 
@@ -25,7 +25,7 @@ First, [some slides!](https://docs.google.com/presentation/d/1Dcwspo5mkD8sVzpnLq
 
 ### [Building a *Simple* Network Graph](Part 1 - The Graph/README.md)
 
-* Represent people as a network graph in [`networkx`](https://networkx.org/documentation/stable/index.html), visualize the graph with [`plotly`](https://plotly.com/python/)
+* Represent people as a network graph in [`networkx`](https://networkx.org/documentation/stable/index.html), visualize the graph with [`plotly`](https://plotly.com/python/) and [`pyvis`](https://pyvis.readthedocs.io/en/latest/index.html)
 
 ### [Clustered Attribute Graphs](Part 2 - Clustered Graph Attributes/README.md)
 
