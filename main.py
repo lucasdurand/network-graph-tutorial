@@ -382,7 +382,7 @@ fig.update_xaxes(matches=None, title_text=None)
 # 
 # NetworkX provides an easy-to-use, *fast*, graph framework to represent relationships in-memory
 
-# In[2]:
+# In[1]:
 
 
 import networkx as nx
@@ -392,7 +392,7 @@ G = nx.Graph()
 
 # It's easy to load in data one at a time
 
-# In[3]:
+# In[2]:
 
 
 G.add_node("Me", type="person", languages=["Python"])
@@ -400,7 +400,7 @@ G.add_node("Me", type="person", languages=["Python"])
 
 # Or from an iterable object
 
-# In[4]:
+# In[3]:
 
 
 G.add_nodes_from((
@@ -411,25 +411,25 @@ G.add_nodes_from((
 
 # Now we can look at the new data structure and play around with it:
 
-# In[5]:
+# In[4]:
 
 
 G.nodes() # show all the node labels
 
 
-# In[6]:
+# In[5]:
 
 
 G.nodes(data=True) # show all attributes in nodes
 
 
-# In[7]:
+# In[6]:
 
 
 G.nodes(data="languages") # show a specific attribute
 
 
-# In[8]:
+# In[7]:
 
 
 G.add_edge("Me","You", label="friends") # add an edge connecting two nodes ...
@@ -438,13 +438,13 @@ G.add_edge("You","Them", label="friends") # add an edge connecting two nodes ...
 
 # There are lots of common and complex graph analysis functions available to make the most of the data structure 
 
-# In[9]:
+# In[8]:
 
 
 nx.shortest_path(G, source="Me", target="Them") # find paths between nodes through edges
 
 
-# In[10]:
+# In[9]:
 
 
 G.adj # find adjacent nodes
@@ -452,7 +452,7 @@ G.adj # find adjacent nodes
 
 # And visualizing is built-in with `matplotlib`. We will pretty this up later with `plotly`
 
-# In[11]:
+# In[10]:
 
 
 nx.draw(G, with_labels=True)
@@ -466,13 +466,13 @@ nx.draw(G, with_labels=True)
 # 
 # Now we're ready to define and populate the network graph. NetworkX provides helpful methods to populate the structure from an iterable. Here we massage our list of `people` a bit in order to give a unique name to each *node* in the graph:
 
-# In[16]:
+# In[12]:
 
 
 from more_itertools import take
 
 
-# In[18]:
+# In[13]:
 
 
 G = nx.Graph() # a simple undirected graph
@@ -484,7 +484,7 @@ take(3, G.nodes(data=True)) # we can look at the contents (which should be very 
 # 
 # Graphs lends themselves well to visual representations. NetworkX also makes this easy to do by tapping into Python's workhorse plotting library, `matplotlib`. We will revisit this later with a more dynamic + interactive approach to visualizing, but for the moment this is the fastest way to get things on paper
 
-# In[19]:
+# In[14]:
 
 
 import matplotlib.pyplot as plt
@@ -493,14 +493,14 @@ nx.draw(G, with_labels=False)
 
 # Let's add a bit of color to this by mapping colors to the `person.team`. Pick any colorscale from `px.colors` (or make your own!). Generally the *qualitative* colors look nice, anything designed for *categorical* data 
 
-# In[20]:
+# In[15]:
 
 
 colors = dict(zip(people_df.team.unique(),px.colors.qualitative.Vivid))
 colors
 
 
-# In[21]:
+# In[16]:
 
 
 # here are some helpful helpers to translate colors
@@ -512,7 +512,7 @@ def rgb_string_to_tuple(rgb:str) -> tuple[int,int,int]:
 
 # Now we can determine what the color should be for each node and pass that into the `nx.draw` call as a list of `node_color`. The easiest way to do this is to use `G.nodes(data=...)` for the attribute you want to extract, which will give you a map from each node to that attribute. `nx` allows you to iterate
 
-# In[22]:
+# In[17]:
 
 
 node_colors = [rgb_to_hex(*rgb_string_to_tuple(colors[team])) for _,team in G.nodes(data="team")]
@@ -523,7 +523,7 @@ nx.draw(G, node_color=node_colors)
 # 
 # Be sure to only add edges that reference nodes that exist
 
-# In[23]:
+# In[18]:
 
 
 G.add_edges_from(G.nodes(data="manager"), label="manager", manager=True)
@@ -531,7 +531,7 @@ G.add_edges_from(G.nodes(data="manager"), label="manager", manager=True)
 
 # Now this should look a bit more sensible
 
-# In[24]:
+# In[19]:
 
 
 nx.draw(G, node_color=node_colors)
@@ -539,14 +539,14 @@ nx.draw(G, node_color=node_colors)
 
 # To view more details of the plot, it's useful to switch to an interactive plotting library like `plotly`. Here we provide a helper function for this, but by no means is this perfect/optimized
 
-# In[25]:
+# In[20]:
 
 
 import pandas as pd
 import plotly.express as px
 
 
-# In[26]:
+# In[21]:
 
 
 import plotly.graph_objects as go
@@ -610,7 +610,7 @@ def px_plot_nx(G:nx.Graph, *, layout=nx.spring_layout, with_edges=False, **nodek
 # 
 # **Note: plotting `with_edges=True` is quite expensive, try toggling it off if you find it bothersome**
 
-# In[27]:
+# In[22]:
 
 
 from functools import partial
@@ -649,14 +649,16 @@ px_plot_nx(
 # 
 # Unfortunately the output [won't render in VSCode](https://github.com/microsoft/vscode-jupyter/issues/12689) ... but if you're in Jupyter or view the html file in a browser you're cooking
 
-# In[30]:
+# In[27]:
 
 
+from IPython.display import display
 from pyvis.network import Network
 nt = Network(notebook=True, cdn_resources="in_line", bgcolor="black")
 # populates the nodes and edges data structures
 nt.from_nx(G)
-nt.show('nx.html')
+
+#nt.show('nx.html')
 
 
 # `pyvis` will prettify your graph for you if you include attributes:
@@ -738,16 +740,10 @@ def add_legend_nodes(G:nx.Graph):
     G.add_nodes_from(legend_nodes)
 
 
-# In[38]:
+# In[28]:
 
 
-nt_show(H, color="team", label="_title", title="city", bgcolor="black")
-
-
-# In[ ]:
-
-
-
+# nt_show(H, color="team", label="_title", title="city", bgcolor="black")
 
 
 # Now we can take extra info (attributes) of each person (node) and map those onto nodes. This will allow us to connect people *through* common attributes, and not just through relationships like "reporting structure" or "hierarchy"
@@ -804,10 +800,10 @@ add_edges_from_attributes(G, attribute="city")
 px_plot_nx(G, height=800, hover_name="label", color="team", size="rank", with_edges=False, template="plotly_dark")
 
 
-# In[6]:
+# In[1]:
 
 
-nt_show(G, title="label", color="team", size="rank", bgcolor="black")
+# nt_show(G, title="label", color="team", size="rank", bgcolor="black")
 
 
 # ## Extras
@@ -860,12 +856,6 @@ nt_show(G, title="label", color="team", size="rank", bgcolor="black")
 # friends = similarities.sel(person="Lucas").sortby(similarities.sel(person="Lucas"))
 # friends[:2].person2
 # ```
-
-# In[ ]:
-
-
-
-
 
 # But this is the same approach (in spirit) to representing a graph as vectors in N-dimensional space (only here we do just 2-dim). A more common approach is to use `node2vec` and then look for closeness in the vectors
 
@@ -1081,7 +1071,7 @@ def node_color_stylesheet(attribute:str) -> dict:
     ]
 
 
-# In[21]:
+# In[22]:
 
 
 from dash import dash, html, dcc, Input, Output
@@ -1158,20 +1148,20 @@ def layout():
                 [
                     dbc.NavItem(
                         dbc.NavLink(
+                            "PyData NYC 2023",
+                            href="https://nyc2023.pydata.org/cfp/talk/KXWQGC/",
+                        )
+                    ),
+                    dbc.NavItem(
+                        dbc.NavLink(
                             "PyData Seattle 2023",
-                            href="https://pydata.org/seattle2023/schedule/",
+                            href="https://seattle2023.pydata.org/cfp/talk/83P9D7/",
                         )
                     ),
                     dbc.NavItem(
                         dbc.NavLink(
                             "Network Graph Tutorial",
                             href="https://lucasdurand.xyz/network-graph-tutorial",
-                        )
-                    ),
-                    dbc.NavItem(
-                        dbc.NavLink(
-                            "Talk",
-                            href="https://seattle2023.pydata.org/cfp/talk/83P9D7/",
                         )
                     ),
                 ],
