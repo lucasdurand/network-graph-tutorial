@@ -24,6 +24,9 @@ matplotlib = "*"
 more-itertools = "*"
 gunicorn = {version = "*", sys_platform = "== 'linux'"}
 pyvis = "*"
+ydata-synthetic = "*"
+gravis = "*"
+nbformat = "*"
 
 [requires]
-python_version = "3.11"
+python_version = "3.10"
