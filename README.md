@@ -1,6 +1,8 @@
 # Building an Interactive Network Graph to Understand Communities
 
-*A hands-on tutorial originally given for [PyData Seattle 2023](https://seattle2023.pydata.org/cfp/talk/83P9D7/), then [PyData NYC 2023](https://nyc2023.pydata.org/cfp/talk/KXWQGC/) where we learn about people, put them into graphs, then build a [fun graph app](https://community-networks-pydata.uc.r.appspot.com/)!*
+*A hands-on tutorial originally given for PyData [Seattle](https://seattle2023.pydata.org/cfp/talk/83P9D7/)/[NYC](https://nyc2023.pydata.org/cfp/talk/KXWQGC/)/[Global](https://global2023.pydata.org/cfp/talk/ZG3JH7/), and [PyCon US](https://us.pycon.org/2024/schedule/presentation/91/), where we learn about people, put them into graphs, then build a [fun graph app](https://community-networks-pydata.uc.r.appspot.com/)!*
+
+For past recordings, try: [Seattle](https://www.youtube.com/watch?v=n0xe7nHd3QA)/[NYC](https://youtube.com/watch?v=3LwxyynEUwQ)/[Global](https://www.youtube.com/watch?v=QUD7zkT_xJY) 
 
 ## Introduction -- People?!
 
