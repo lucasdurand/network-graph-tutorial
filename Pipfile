@@ -12,6 +12,7 @@ black = "*"
 isort = "*"
 ipykernel = "*"
 pylint = "*"
+nbformat = "*"
 
 [packages]
 pandas = "*"
@@ -24,9 +25,8 @@ matplotlib = "*"
 more-itertools = "*"
 gunicorn = {version = "*", sys_platform = "== 'linux'"}
 pyvis = "*"
-ydata-synthetic = "*"
 gravis = "*"
-nbformat = "*"
+node2vec = "*"
 
 [requires]
 python_version = "3.10"
